@@ -1,34 +1,86 @@
 /* ============================================================
    大梅沙垃圾图鉴 · Submission Form
-   Photo upload → compress → Supabase Storage → DB insert
+   Photo upload → bg remove → compress → Supabase Storage → DB insert
    Falls back to localStorage if Supabase not configured.
    ============================================================ */
 
 (function () {
   'use strict';
 
-  /* ── Photo preview ───────────────────────────────────────── */
+  const REMBG_KEY = 'bRTh7AZxBtp2cbxRFL1vrTyj';
+
+  /* Holds the background-removed PNG blob (null = use original) */
+  let processedBlob = null;
+
+  /* ── Status indicator ────────────────────────────────────── */
+  function setStatus(msg, type /* 'loading' | 'done' | 'error' | '' */) {
+    const el = document.getElementById('bg-remove-status');
+    if (!el) return;
+    if (!msg) { el.setAttribute('hidden', ''); el.textContent = ''; return; }
+    el.removeAttribute('hidden');
+    el.textContent = msg;
+    el.className = `bg-remove-status${type ? ' bg-remove-' + type : ''}`;
+  }
+
+  /* ── Photo preview + background removal ─────────────────── */
   function initPhotoPreview() {
     const input       = document.getElementById('f-photo');
     const preview     = document.getElementById('photo-preview');
     const placeholder = document.getElementById('upload-placeholder');
     if (!input) return;
 
-    input.addEventListener('change', () => {
+    input.addEventListener('change', async () => {
       const file = input.files[0];
       if (!file) return;
-      const url = URL.createObjectURL(file);
-      preview.src = url;
+
+      // Show original immediately
+      processedBlob = null;
+      const origUrl = URL.createObjectURL(file);
+      preview.src = origUrl;
       preview.style.display = 'block';
       if (placeholder) placeholder.style.display = 'none';
+
+      // Start background removal
+      setStatus('正在去除背景，请稍候…', 'loading');
+
+      try {
+        const fd = new FormData();
+        fd.append('image_file', file);
+        fd.append('size', 'auto');
+
+        const res = await fetch('https://api.remove.bg/v1.0/removebg', {
+          method: 'POST',
+          headers: { 'X-Api-Key': REMBG_KEY },
+          body: fd
+        });
+
+        if (!res.ok) throw new Error(`remove.bg ${res.status}`);
+        const blob = await res.blob();
+
+        processedBlob = blob;
+
+        // Update preview to show result
+        URL.revokeObjectURL(origUrl);
+        preview.src = URL.createObjectURL(blob);
+        setStatus('✓ 背景已去除', 'done');
+
+        // Auto-clear status after 3s
+        setTimeout(() => setStatus('', ''), 3000);
+
+      } catch (err) {
+        console.warn('Background removal failed:', err);
+        processedBlob = null;
+        setStatus('去背景失败，将使用原图上传', 'error');
+        setTimeout(() => setStatus('', ''), 4000);
+      }
     });
   }
 
   /* ── Compress image via canvas ───────────────────────────── */
-  function compressImage(file, maxPx = 1200, quality = 0.82) {
+  function compressImage(source, maxPx = 1200, quality = 0.82, isPng = false) {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      const url = URL.createObjectURL(file);
+      const url = URL.createObjectURL(source);
       img.onload = () => {
         URL.revokeObjectURL(url);
         let { width, height } = img;
@@ -39,7 +91,11 @@
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Compress failed')), 'image/jpeg', quality);
+        if (isPng) {
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Compress failed')), 'image/png');
+        } else {
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Compress failed')), 'image/jpeg', quality);
+        }
       };
       img.onerror = reject;
       img.src = url;
@@ -50,11 +106,22 @@
   async function uploadPhoto(file) {
     if (!window.supabaseClient) return null;
     try {
-      const blob     = await compressImage(file);
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+      let blob, filename, contentType;
+
+      if (processedBlob) {
+        // Use background-removed PNG (preserve transparency)
+        blob        = await compressImage(processedBlob, 1200, 0.82, true);
+        filename    = `${Date.now()}-${Math.random().toString(36).slice(2)}.png`;
+        contentType = 'image/png';
+      } else {
+        blob        = await compressImage(file);
+        filename    = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
+        contentType = 'image/jpeg';
+      }
+
       const { data, error } = await window.supabaseClient.storage
         .from('trash-photos')
-        .upload(filename, blob, { contentType: 'image/jpeg', upsert: false });
+        .upload(filename, blob, { contentType, upsert: false });
 
       if (error) throw error;
 
@@ -136,6 +203,8 @@
     if (preview) { preview.style.display = 'none'; preview.src = ''; }
     if (placeholder) placeholder.style.display = '';
     form?.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+    processedBlob = null;
+    setStatus('', '');
   };
 
   /* ── Handle submit ───────────────────────────────────────── */

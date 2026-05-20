@@ -150,6 +150,24 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 }
 
 /* Nav pill */
+.hero-scroll-arrow {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  animation: arrow-bounce 2s ease-in-out infinite;
+}
+.hero-scroll-arrow:hover { opacity: 0.7; }
+@keyframes arrow-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(8px); }
+}
+
 .hero-nav {
   position: absolute;
   bottom: 2.5rem;
@@ -174,10 +192,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   transition: background 0.2s, color 0.2s;
   white-space: nowrap;
 }
-.nav-link:hover,
-.nav-link.active {
-  background: var(--white);
+.nav-link:hover {
+  background: rgba(85,205,242,0.15);
   color: var(--ink);
+}
+.nav-link.active {
+  background: #55cdf2;
+  color: #ffffff;
 }
 
 /* Sticky nav (when scrolled past hero) */
@@ -241,7 +262,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 /* ─── STATS ─────────────────────────────────────────────────── */
 .stats-section {
-  background: var(--ocean);
+  background: #47c3ea;
   padding: 2rem 1.5rem;
 }
 .stats-inner {
@@ -277,10 +298,11 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
   letter-spacing: 0.03em;
 }
 .stat-divider {
-  width: 1px;
+  width: 2.5px;
   height: 40px;
-  background: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.8);
   flex-shrink: 0;
+  border-radius: 2px;
 }
 
 /* ─── GALLERY ───────────────────────────────────────────────── */
@@ -683,8 +705,35 @@ textarea { resize: vertical; min-height: 100px; }
 .photo-preview {
   width: 100%;
   max-height: 240px;
-  object-fit: cover;
+  object-fit: contain;
   display: none;
+  background: transparent;
+}
+
+/* Background removal status indicator */
+.bg-remove-status {
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  text-align: center;
+}
+.bg-remove-loading {
+  background: #eef7fd;
+  color: #2a9ec7;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.bg-remove-done {
+  background: #edfaf3;
+  color: #27a060;
+}
+.bg-remove-error {
+  background: #fff3f3;
+  color: #d9534f;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
 }
 
 .btn-submit {
