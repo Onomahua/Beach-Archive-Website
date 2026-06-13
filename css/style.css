@@ -1176,11 +1176,42 @@ textarea { resize: vertical; min-height: 100px; }
   .rank-name  { font-size: 0.88rem; }
   .rank-score { font-size: 1rem; }
   .rank-score-bar { width: 60px; }
+
+  /* ── 顶部栏：手机只留 logo 图片 + 关于 ── */
+  .sticky-logo-text { display: none; }
+  .sticky-logo img  { height: 36px; width: auto; object-fit: contain; }
+  .sticky-desktop-only { display: none !important; }
+  .site-nav-sticky { padding: 0.6rem 1rem; }
+
+  /* ── 垃圾分类按钮：两排显示 ── */
+  .filter-bar {
+    flex-wrap: wrap;
+    overflow-x: visible;
+    justify-content: center;
+    gap: 0.4rem;
+    padding-bottom: 0;
+  }
+  .filter-btn {
+    flex: 0 0 auto;
+    font-size: 0.82rem;
+    padding: 0.38rem 0.9rem;
+  }
+
+  /* ── 排行榜三个按钮一行 ── */
+  .rank-tabs {
+    flex-wrap: nowrap;
+    gap: 0.4rem;
+  }
+  .rank-tab {
+    flex: 1;
+    padding: 0.45rem 0.5rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
-  .filter-bar { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 0.5rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-  .filter-bar::-webkit-scrollbar { display: none; }
   .hero-nav { gap: 0; }
   .nav-link { padding: 0.4rem 0.85rem; font-size: 0.82rem; }
   .modal-info-grid { grid-template-columns: 1fr; }

@@ -142,12 +142,12 @@
     sticky.innerHTML = `
       <div class="sticky-logo">
         <img src="assets/logo- main.png" alt="轻扫" onerror="this.style.display='none'">
-        大梅沙垃圾图鉴
+        <span class="sticky-logo-text">大梅沙垃圾图鉴</span>
       </div>
       <div class="sticky-links">
-        <a href="#gallery">图鉴</a>
-        <a href="#rankings">排行榜</a>
-        <a href="#submit">投递标本</a>
+        <a href="#gallery" class="sticky-desktop-only">图鉴</a>
+        <a href="#rankings" class="sticky-desktop-only">排行榜</a>
+        <a href="#submit" class="sticky-desktop-only">投递标本</a>
         <a href="#" id="about-trigger">关于轻扫Action</a>
       </div>`;
     document.body.prepend(sticky);
