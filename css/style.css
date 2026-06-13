@@ -1149,15 +1149,48 @@ textarea { resize: vertical; min-height: 100px; }
   .stats-inner { gap: 0; }
   .stat-divider { display: none; }
   .stat { min-width: 50%; }
+
+  /* 手机不加载12MB的背景图，改用纯色 */
+  .submit-section {
+    background-image: none;
+    background-color: var(--sand);
+  }
+
+  /* 图鉴：手机上2列，避免单卡占满屏幕 */
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  /* 卡片图片区域手机上缩小内边距 */
+  .card-photo-wrap { padding: 0.75rem; }
+
+  /* 字体大小统一 */
+  .section-title { font-size: clamp(1.8rem, 7vw, 2.4rem); }
+  .section-sub   { font-size: 0.82rem; }
+  .stat-num      { font-size: clamp(1.4rem, 5vw, 2rem); }
+  .stat-label    { font-size: 0.72rem; }
+
+  /* 排行榜缩小缩略图 */
+  .rank-thumb { width: 42px; height: 42px; }
+  .rank-name  { font-size: 0.88rem; }
+  .rank-score { font-size: 1rem; }
+  .rank-score-bar { width: 60px; }
 }
 
 @media (max-width: 480px) {
   .filter-bar { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; padding-bottom: 0.5rem; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .filter-bar::-webkit-scrollbar { display: none; }
-  .gallery-grid { grid-template-columns: 1fr; }
   .hero-nav { gap: 0; }
   .nav-link { padding: 0.4rem 0.85rem; font-size: 0.82rem; }
   .modal-info-grid { grid-template-columns: 1fr; }
+
+  /* 极小屏幕：hero marquee 图标缩小 */
+  .mq-item { height: clamp(60px, 18vw, 100px); margin-right: clamp(1.5rem, 5vw, 4rem); }
+
+  /* 滚动条区域字体调小 */
+  .hero-watermark { font-size: clamp(1.2rem, 7vw, 2rem); }
+  .hero-zh        { font-size: clamp(2.2rem, 12vw, 4rem); }
 }
 
 /* ─── Placeholder image fallback ─────────────────────────────── */

@@ -315,7 +315,9 @@
       video.addEventListener('ended', dismiss);
       // Safety fallback in case video fails to load
       video.addEventListener('error', dismiss);
-      setTimeout(dismiss, 15000);
+      // 手机端视频常被浏览器阻止自动播放，缩短 fallback 等待时间
+      var timeout = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 4000 : 15000;
+      setTimeout(dismiss, timeout);
     })();
   </script>
 
